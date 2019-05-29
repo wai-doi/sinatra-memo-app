@@ -53,10 +53,6 @@ class Memo
       }
     end
 
-    def new_id
-      File.read(LATEST_ID_FILE).to_i + 1
-    end
-
     def find(id)
       all.find { |memo| memo.id == id.to_i }
     end
@@ -76,14 +72,18 @@ class Memo
 
     private
 
+    def new_id
+      File.read(LATEST_ID_FILE).to_i + 1
+    end
+
     def add_new_record(title, body)
       CSV.open(DB, 'a') do |csv|
-        csv << [Memo.new_id, title, body]
+        csv << [new_id, title, body]
       end
     end
 
     def update_latest_id
-      File.write(LATEST_ID_FILE, "#{Memo.new_id}")
+      File.write(LATEST_ID_FILE, "#{new_id}")
     end
 
     def updated_csv_data(id, title, body)
