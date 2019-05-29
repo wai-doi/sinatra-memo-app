@@ -1,0 +1,10 @@
+h1 
+  a href="/" メモアプリ
+h2 = memo.title
+p = memo.body
+
+a href="/edit/#{memo.id}" 変更
+
+form action="/#{memo.id}" method="post"
+  input type="hidden" name="_method" value="DELETE"
+  button type="submit" 削除

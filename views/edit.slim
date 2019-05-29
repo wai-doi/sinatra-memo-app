@@ -1,0 +1,15 @@
+h1 
+  a href="/"メモアプリ
+form action="/#{memo.id}" method="post"
+  input type="hidden" name="_method" value="PATCH"
+  p 
+    | タイトル
+    br
+    input type="text" name="title" size="20" value="#{memo.title}"
+
+  p 
+    | 本文
+    br
+    textarea name="body" rows="4" cols="40" =memo.body
+
+  input type="submit" value="変更"
