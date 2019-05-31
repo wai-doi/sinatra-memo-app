@@ -87,7 +87,7 @@ class Memo
         f.flock(File::LOCK_EX)
         new_id = f.read.to_i + 1
         f.rewind
-        f.write(new_id.to_s)
+        f.write(new_id)
       end
     end
 
