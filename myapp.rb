@@ -83,7 +83,12 @@ class Memo
     end
 
     def update_latest_id
-      File.write(LATEST_ID_FILE, "#{new_id}")
+      File.open(LATEST_ID_FILE, 'r+') do |f|
+        f.flock(File::LOCK_EX)
+        new_id = f.read.to_i + 1
+        f.rewind
+        f.write(new_id.to_s)
+      end
     end
 
     def updated_csv_data(id, title, body)
