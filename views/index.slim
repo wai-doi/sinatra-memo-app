@@ -2,6 +2,6 @@ h1 メモアプリ
 ul
   - memos.each do |memo|
     li 
-      a href="/#{memo.id}" =memo.title
+      a href="/memos/#{memo.id}" =memo.title
 
-a href="/new" 新規追加
+a href="/memos/new" 新規追加

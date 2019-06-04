@@ -4,39 +4,41 @@ require 'slim'
 require 'csv'
 
 # index
-get '/' do
-  slim :index, locals: { memos: Memo.all }
+%w(/ /memos).each do |path|
+  get path do
+    slim :index, locals: { memos: Memo.all }
+  end
 end
 
 # show
-get %r{/(\d+)} do |id|
+get %r{/memos/(\d+)} do |id|
   slim :show, locals: { memo: Memo.find(id) }
 end
 
 # new
-get '/new' do
+get '/memos/new' do
   slim :new
 end
 
 # create
-post '/' do
+post '/memos' do
   Memo.create(title: params['title'], body: params['body'])
   redirect to('/')
 end
 
 # edit
-get %r{/edit/(\d+)} do |id|
+get %r{/memos/(\d+)/edit} do |id|
   slim :edit, locals: { memo: Memo.find(id) }
 end
 
 # update
-patch %r{/(\d+)} do |id|
+patch %r{/memos/(\d+)} do |id|
   Memo.find(id).update(title: params['title'], body: params['body'])
-  redirect to("/#{id}")
+  redirect to("/memos/#{id}")
 end
 
 # delete
-delete %r{/(\d+)} do |id|
+delete %r{/memos/(\d+)} do |id|
   Memo.find(id).delete
   redirect to('/')
 end
