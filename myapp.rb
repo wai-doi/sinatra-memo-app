@@ -4,10 +4,12 @@ require 'slim'
 require 'csv'
 
 # index
-%w(/ /memos).each do |path|
-  get path do
-    slim :index, locals: { memos: Memo.all }
-  end
+get '/' do
+  slim :index, locals: { memos: Memo.all }
+end
+
+get '/memos' do
+  redirect to('/')
 end
 
 # show
