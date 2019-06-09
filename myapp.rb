@@ -52,9 +52,7 @@ class Memo
 
   class << self
     def all
-      CSV.foreach(DB).map { |line|
-        Memo.new(id: line[0], title: line[1], body: line[2])
-      }
+      csv_table.map { |row| Memo.new(row.to_hash) }
     end
 
     def find(id)
@@ -62,63 +60,44 @@ class Memo
     end
 
     def create(title: title, body: body)
-      add_new_record(title, body)
+      write(csv_table << [new_id, title, body])
       update_latest_id
     end
 
     def update(id:, title:, body:)
-      replace_db_with(updated_csv_data(id, title, body))
+      table = csv_table
+      row = table.find { |row| row[:id] == id }
+      row[:title] = title
+      row[:body] = body
+      write(table)
     end
 
     def delete(id:)
-      replace_db_with(deleted_csv_data(id))
+      table = csv_table
+      table.delete_if { |row| row[:id] == id }
+      write(table)
     end
 
     private
+
+    def csv_table
+      CSV.table(DB, headers: %w(id title body))
+    end
 
     def new_id
       File.read(LATEST_ID_FILE).to_i + 1
     end
 
-    def add_new_record(title, body)
-      CSV.open(DB, 'a') do |csv|
-        csv << [new_id, title, body]
-      end
+    def write(table)
+      File.write(DB, table.to_s(write_headers: false))
     end
 
     def update_latest_id
       File.open(LATEST_ID_FILE, 'r+') do |f|
         f.flock(File::LOCK_EX)
-        new_id = f.read.to_i + 1
+        new_id = f.read.succ
         f.rewind
         f.write(new_id)
-      end
-    end
-
-    def updated_csv_data(id, title, body)
-      CSV.generate { |csv|
-        all.each do |memo|
-          if memo.id == id.to_i
-            csv << [id, title, body]
-          else
-            csv << [memo.id, memo.title, memo.body]
-          end
-        end
-      }
-    end
-
-    def deleted_csv_data(id)
-      CSV.generate { |csv|
-        all.each do |memo|
-          next if memo.id.to_i == id.to_i
-          csv << [memo.id, memo.title, memo.body]
-        end
-      }
-    end
-
-    def replace_db_with(csv_data)
-      File.open(DB, 'w') do |f|
-        f.write(csv_data)
       end
     end
   end
